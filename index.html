@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pinewake Exchange (fictional test site)</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#1d2330; --muted:#5d6675; --line:#dde1e7; --accent:#1f6f5c; --accent-ink:#fff; --warn:#9a6700; --err:#b42318; --ok:#1a7f37; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--ink); }
+  a { color:var(--accent); cursor:pointer; }
+  button { font:inherit; cursor:pointer; }
+  .gtmbar { background:#111827; color:#e5e7eb; font-size:13px; padding:6px 16px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .gtmbar input { font:inherit; padding:2px 6px; width:150px; }
+  .gtmbar .tag { background:#374151; padding:1px 8px; border-radius:10px; }
+  header { background:var(--card); border-bottom:1px solid var(--line); padding:12px 16px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .brand { font-weight:700; font-size:19px; color:var(--accent); }
+  .brand small { font-weight:400; color:var(--muted); font-size:12px; margin-left:6px; }
+  header nav { display:flex; gap:14px; margin-left:auto; align-items:center; }
+  .btn { background:var(--accent); color:var(--accent-ink); border:0; border-radius:6px; padding:8px 14px; }
+  .btn.secondary { background:#e8efed; color:var(--accent); }
+  main { max-width:1000px; margin:20px auto; padding:0 16px 160px; }
+  .hero { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:28px; }
+  .hero h1 { margin:0 0 12px; font-size:26px; }
+  .searchrow { display:flex; gap:8px; flex-wrap:wrap; }
+  .searchrow input { flex:1; min-width:180px; padding:9px 10px; border:1px solid var(--line); border-radius:6px; font:inherit; }
+  .grid { display:grid; grid-template-columns:220px 1fr; gap:18px; }
+  @media (max-width:720px){ .grid { grid-template-columns:1fr; } }
+  .panel { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:12px; display:flex; justify-content:space-between; gap:12px; cursor:pointer; }
+  .card:hover { border-color:var(--accent); }
+  .muted { color:var(--muted); }
+  .price { font-weight:700; font-size:18px; }
+  .listing-main h1 { margin:0 0 4px; font-size:24px; }
+  dl.specs { display:grid; grid-template-columns:120px 1fr; gap:4px 12px; margin:12px 0; }
+  dl.specs dt { color:var(--muted); }
+  form label { display:block; margin:8px 0 2px; font-size:13px; color:var(--muted); }
+  form input, form textarea { width:100%; padding:8px; border:1px solid var(--line); border-radius:6px; font:inherit; }
+  .msg { margin-top:10px; font-size:14px; }
+  .msg.err { color:var(--err); } .msg.ok { color:var(--ok); }
+  .similar { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; }
+  .similar-card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; }
+  .mini { background:#eef2f1; color:var(--accent); border:1px solid #cfdcd8; border-radius:6px; padding:5px 10px; font-size:13px; }
+  .consent { position:fixed; left:16px; bottom:16px; max-width:420px; background:#fff; border:1px solid var(--line); border-radius:10px; padding:14px; box-shadow:0 6px 24px rgba(0,0,0,.12); z-index:20; }
+  .consent .row { display:flex; gap:8px; margin-top:10px; }
+  .drawer { position:fixed; top:0; right:0; height:100%; width:min(560px,100%); background:#fff; border-left:1px solid var(--line); box-shadow:-6px 0 24px rgba(0,0,0,.1); overflow:auto; padding:20px 22px 60px; z-index:30; display:none; }
+  .drawer.open { display:block; }
+  .drawer h2 { margin-top:22px; font-size:17px; }
+  .drawer code, .drawer pre { background:#f3f4f6; border-radius:4px; padding:1px 4px; font-size:13px; }
+  .drawer pre { padding:10px; overflow:auto; white-space:pre-wrap; }
+  .drawer ol li, .drawer ul li { margin-bottom:6px; }
+  .fslog { position:fixed; right:16px; bottom:16px; width:min(460px,calc(100% - 32px)); max-height:45vh; display:flex; flex-direction:column; background:#0f172a; color:#e2e8f0; border-radius:10px; font:12px/1.4 ui-monospace,Menlo,Consolas,monospace; z-index:25; box-shadow:0 6px 24px rgba(0,0,0,.25); }
+  .fslog .hd { display:flex; align-items:center; gap:8px; padding:8px 10px; border-bottom:1px solid #1e293b; font-family:system-ui,sans-serif; font-size:13px; }
+  .fslog .hd b { margin-right:auto; }
+  .fslog .hd button { background:#1e293b; color:#e2e8f0; border:1px solid #334155; border-radius:5px; padding:2px 8px; font-size:12px; }
+  .fslog .bd { overflow:auto; padding:6px 10px; }
+  .fslog .bd.collapsed { display:none; }
+  .fslog .e { border-bottom:1px dashed #1e293b; padding:5px 0; white-space:pre-wrap; word-break:break-word; }
+  .fslog .e .n { color:#94a3b8; }
+  .fslog .e.warn .note { color:#fbbf24; } .fslog .e.error .note { color:#f87171; } .fslog .e.info .note { color:#86efac; }
+  footer { text-align:center; color:var(--muted); font-size:12px; margin-top:30px; }
+  #copyArea { width:100%; height:120px; margin-top:6px; display:none; }
+  .lead-state-box { margin-top:10px; font-size:14px; }
+  .is-success, .form-msg--sent, [data-state="sent"] { color:var(--ok); }
+  .is-error, .form-msg--error, [data-state="failed"] { color:var(--err); }
+</style>
+
+<script>
+/* ---------- Simulated Fullstory browser API (records calls; nothing is sent anywhere). Log survives page loads in this tab. ---------- */
+(function () {
+  var KEY = 'pw_fs_log';
+  var log = [];
+  try { log = JSON.parse(sessionStorage.getItem(KEY) || '[]'); } catch (e) { log = []; }
+  var currentUid = null;
+  var listeners = [];
+  function save() { try { sessionStorage.setItem(KEY, JSON.stringify(log)); } catch (e) {} }
+  function clone(x) { try { return JSON.parse(JSON.stringify(x)); } catch (e) { return String(x); } }
+  function record(method, args, level, note) {
+    var entry = { n: log.length + 1, time: new Date().toISOString().slice(11, 23), path: location.pathname + location.search, method: method, args: clone(args), level: level, note: note || '' };
+    log.push(entry); save();
+    listeners.forEach(function (fn) { try { fn(entry); } catch (e) {} });
+  }
+  var pageNameSet = null;
+  function FS(method, args) {
+    if (typeof method !== 'string') { record(String(method), args, 'error', 'First argument must be a method name string, e.g. FS("trackEvent", {...}).'); return; }
+    switch (method) {
+      case 'trackEvent':
+        if (!args || typeof args.name !== 'string' || !args.name.trim()) { record(method, args, 'error', 'trackEvent requires { name: string, properties?: object }.'); return; }
+        if (args.properties !== undefined && (typeof args.properties !== 'object' || args.properties === null || Array.isArray(args.properties))) { record(method, args, 'error', 'properties must be a plain object.'); return; }
+        record(method, args, 'ok'); return;
+      case 'setProperties':
+        if (!args || (args.type !== 'page' && args.type !== 'user')) { record(method, args, 'error', 'setProperties requires type: "page" or "user".'); return; }
+        if (!args.properties || typeof args.properties !== 'object') { record(method, args, 'error', 'setProperties requires a properties object.'); return; }
+        if (args.type === 'page' && args.properties.pageName !== undefined) {
+          if (pageNameSet !== null && pageNameSet !== args.properties.pageName) { record(method, args, 'error', 'pageNameChanged: a different pageName was set on the same page. Fullstory rejects the new pageName.'); return; }
+          pageNameSet = args.properties.pageName;
+        }
+        record(method, args, 'ok'); return;
+      case 'setIdentity':
+        if (!args || (typeof args.uid !== 'string' && typeof args.uid !== 'number') || String(args.uid) === '') { record(method, args, 'error', 'setIdentity requires { uid, properties? }.'); return; }
+        if (currentUid !== null && String(currentUid) !== String(args.uid)) { record(method, args, 'warn', 'uid changed for an identified user: Fullstory would split this into a new session.'); currentUid = args.uid; return; }
+        currentUid = args.uid; record(method, args, 'ok'); return;
+      case 'setIdentityAnonymous': case 'anonymize': case 'log': case 'getSession': case 'observe': case 'shutdown': case 'restart': case 'setConfig': case 'start':
+        record(method, args, 'ok'); return;
+      default:
+        record(method, args, 'error', 'Unknown Fullstory method.');
+    }
+  }
+  function legacy(name) { return function () { record('FS.' + name + ' (v1)', Array.prototype.slice.call(arguments), 'warn', 'Legacy v1 API: accepted, but v2 FS("...") calls are current.'); }; }
+  FS.event = legacy('event'); FS.identify = legacy('identify'); FS.setUserVars = legacy('setUserVars'); FS.setVars = legacy('setVars'); FS.anonymize = legacy('anonymize');
+  window._fs_namespace = 'FS';
+  window.FS = FS;
+  window.__fsSim = { log: log, onRecord: function (fn) { listeners.push(fn); }, clear: function () { log.length = 0; save(); } };
+})();
+
+/* ---------- Site build config ---------- */
+var V = {
+  build: 'PW-9M',
+  phoneMain: 'Detail-Seller Phone-Reveal',
+  phoneSimilar: 'Detail-Similar Listings-Seller Phone-Reveal',
+  leadMessage: function (ok, id) { return ok ? '<p class="form-msg form-msg--sent" data-confirmation="' + id + '">Message sent. Reference ' + id + '.</p>' : '<p class="form-msg form-msg--error">Please enter a valid email address.</p>'; }
+};
+
+/* ---------- Page data: trk (all pages) and srch (search pages), set before GTM loads ---------- */
+(function () {
+  var BASE = location.pathname.replace(/\/(index\.html|404\.html|search|listing\/\d+)?\/?$/, '');
+  window.__pwBase = BASE;
+  var rel = location.pathname.slice(BASE.length) || '/';
+  var qs = new URLSearchParams(location.search);
+  var LISTINGS = {
+    '5048213001': { adid: '5048213001', title: '2022 Northgate 26RB Travel Trailer', type: 'travel trailer', make: 'northgate', model: '26rb', year: '2022', condition: 'used', prodprice: '24500', priceText: '$24,500', dealerid: '2211107', dealerName: 'Lakeshore RV Center', phone: '(555) 014-2207', displayMake: 'Northgate' },
+    '5051877002': { adid: '5051877002', title: '2024 Brightfin 22 Pontoon', type: 'pontoon boat', make: 'brightfin', model: '22', year: '2024', condition: 'new', prodprice: '', priceText: '', dealerid: '2212290', dealerName: 'Harbor Point Marine', phone: '(555) 019-8841', displayMake: 'Brightfin' },
+    '5050302003': { adid: '5050302003', title: '2021 Ridgeway 31C Motorhome', type: 'class c', make: 'ridgeway', model: '31c', year: '2021', condition: 'used', prodprice: '89900', priceText: '$89,900', dealerid: '2211107', dealerName: 'Lakeshore RV Center', phone: '(555) 014-2207', displayMake: 'Ridgeway' }
+  };
+  window.__pwListings = LISTINGS;
+  var geo = { statename: 'ohio', statecode: 'oh', city: 'springfield', zipcode: '45501', dma: '542-dayton-oh' };
+  function base(pagename) { var o = { pagename: pagename, channel: 'find' }; for (var k in geo) o[k] = geo[k]; o.canary = 'Nuxt'; o.sitetype = 'SM'; return o; }
+  var trk, page = 'home', m;
+  if (rel === '/search') {
+    page = 'search';
+    trk = base('search/results');
+    trk.searchsource = 'listings search'; trk.sortby = 'sort (featured)'; trk.numresults = '142'; trk.pagenumber = '1';
+    trk.facetchoice = [qs.get('price') ? 'price' : '', qs.get('condition') ? 'condition' : ''].filter(Boolean).join(',');
+    window.srch = { keyword: qs.get('keyword') || 'trailer', condition: qs.get('condition') || '', pricerange: qs.get('price') || '', make: '', category: '', searchradius: '50' };
+  } else if ((m = rel.match(/^\/listing\/(\d+)$/)) && LISTINGS[m[1]]) {
+    page = 'detail';
+    var l = LISTINGS[m[1]];
+    trk = base('detail');
+    trk.adid = l.adid; trk.type = l.type; trk.make = l.make; trk.model = l.model; trk.year = l.year; trk.condition = l.condition;
+    trk.prodprice = l.prodprice; trk.dealerid = l.dealerid; trk.listingsellertype = 'dealer'; trk.listingtier = 'premium';
+    window.__pwListing = l;
+  } else {
+    trk = base('home');
+  }
+  window.__pwPage = page;
+  window.trk = trk;
+})();
+
+/* ---------- GTM loader: built-in ID, or ?gtm=GTM-XXXX (remembered in this browser) ---------- */
+window.dataLayer = window.dataLayer || [];
+(function () {
+  var id = null;
+  try { id = new URLSearchParams(location.search).get('gtm'); } catch (e) {}
+  var BAKED = 'none';
+  if (!id && /^GTM-/.test(BAKED)) id = BAKED;
+  try { if (id) localStorage.setItem('pw_gtm_id', id); else id = localStorage.getItem('pw_gtm_id'); } catch (e) {}
+  window.__gtmId = (id && /^GTM-[A-Z0-9]+$/i.test(id)) ? id.toUpperCase() : null;
+  if (window.__gtmId) {
+    (function (w, d, s, l, i) { w[l] = w[l] || []; w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' }); var f = d.getElementsByTagName(s)[0], j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f); })(window, document, 'script', 'dataLayer', window.__gtmId);
+  }
+})();
+</script>
+</head>
+<body>
+<div class="gtmbar">
+  <span>Test harness</span>
+  <span class="tag" id="gtmStatus">GTM: not loaded</span>
+  <label>Container ID <input id="gtmInput" placeholder="GTM-XXXXXXX"></label>
+  <button id="gtmLoad">Load</button>
+  <span style="margin-left:auto"><button id="briefBtn">Task brief</button></span>
+</div>
+<header>
+  <div class="brand">Pinewake Exchange<small>fictional test site</small></div>
+  <nav>
+    <a id="navHome" data-track="Nav - Home">Home</a>
+    <a id="navSell" data-track="Nav - Sell">Sell</a>
+    <button class="btn secondary" id="signIn" data-track="Nav - Log In">Log in</button>
+  </nav>
+</header>
+<main id="app"></main>
+<footer><a data-track="Footer-About">About</a> · <a data-track="Footer-Need Help">Need help?</a><br>Pinewake Exchange is fictional. Nothing on this page sends data anywhere except to your own GTM preview.</footer>
+
+<div class="fslog" id="fslog">
+  <div class="hd"><b>Fullstory call log (simulated)</b><button id="logCopy">Copy log</button><button id="logClear">Clear</button><button id="logToggle">Hide</button></div>
+  <div class="bd" id="logBody"><div class="muted" id="logEmpty">No Fullstory calls yet.</div><textarea id="copyArea" readonly></textarea></div>
+</div>
+
+<aside class="drawer" id="drawer">
+  <button style="float:right" id="briefClose">Close</button>
+  <h1 style="font-size:21px;margin-top:0">15-minute work sample: GTM + Fullstory</h1>
+  <p>Pinewake Exchange is a made-up listings marketplace. Build the tracking below in the GTM container you've been given, sending data to Fullstory. Fullstory is already on this page in simulated mode. Every call you make shows in the <b>Fullstory call log</b> at the bottom right, along with any errors Fullstory would give. The log is kept as you move between pages.</p>
+  <p>In GTM, click <b>Preview</b> and connect Tag Assistant to the start link your interviewer gave you.</p>
+
+  <h2>Rules</h2>
+  <ul>
+    <li>Only change things in GTM. Don't edit this page's code.</li>
+    <li>Don't install the Fullstory snippet or template. Call the v2 browser API from your tags, for example <code>FS('trackEvent', { name, properties })</code>.</li>
+    <li>You can use the GTM and Fullstory docs. Please think out loud.</li>
+    <li>Find the data you need yourself, using Tag Assistant, the console and the page's elements.</li>
+  </ul>
+
+  <h2>Requirements (in order)</h2>
+  <ol>
+    <li><b>Listing Viewed</b> event on each listing page, with the listing ID and make, plus the price as a number (for example <code>24500</code>). If a listing has no price, don't send a price.</li>
+    <li><b>Lead Submitted</b> event, <b>only when the lead form is sent successfully</b>, with the lead reference number and the listing ID.</li>
+    <li><b>If you have time:</b> a <b>Phone Revealed</b> event when a visitor reveals the dealer's phone on the <b>main listing</b> (not in the similar-listings cards), with the listing ID.</li>
+  </ol>
+  <p class="muted">When time is up, your interviewer will give you a short click-path to run. Then click <b>Copy log</b> and paste it into the chat.</p>
+  <p class="muted">If you need to start over, reopen the start link.</p>
+</aside>
+
+<script>
+(function () {
+  var BASE = window.__pwBase, L = window.__pwListings, page = window.__pwPage;
+  var qs = new URLSearchParams(location.search);
+  var app = document.getElementById('app');
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function go(url) { location.href = BASE + url; }
+  function phoneButton(track) { return '<button class="' + (track.mini ? 'mini' : 'btn') + '" data-track="' + esc(track.value) + '"><span class="ico" aria-hidden="true">&#9742;</span> <span class="lbl">Show phone number</span></button>'; }
+
+  if (page === 'home') {
+    app.innerHTML = '<section class="hero"><h1>Find your next RV or boat</h1>' +
+      '<div class="searchrow"><input id="q" value="trailer" aria-label="Search"><button class="btn" id="go" data-track="Home - Search Button">Search</button></div>' +
+      '<p class="muted">Popular: travel trailers, pontoons, Class C motorhomes</p></section>';
+    document.getElementById('go').onclick = function () { go('/search?keyword=' + encodeURIComponent(document.getElementById('q').value.trim() || 'trailer')); };
+  }
+
+  if (page === 'search') {
+    var kw = window.srch.keyword;
+    var cards = ['5048213001', '5051877002', '5050302003'].map(function (id) {
+      var l = L[id];
+      return '<div class="card" data-id="' + id + '" data-track="srp|search-results|link|navigation|view-details"><div><b>' + esc(l.title) + '</b><div class="muted">' + esc(l.type) + ' · ' + esc(l.condition) + ' · ' + esc(l.dealerName) + '</div></div><div class="price">' + (l.priceText ? esc(l.priceText) : '<span class="muted" style="font-size:14px">Call for price</span>') + '</div></div>';
+    }).join('');
+    app.innerHTML = '<div class="grid"><aside class="panel"><b>Filters</b>' +
+      '<label style="display:block;margin-top:10px"><input type="checkbox" id="fPrice" data-track="srp|search-facets|checkbox|discovery|apply-filter"' + (qs.get('price') ? ' checked' : '') + '> Under $30,000</label>' +
+      '<label style="display:block;margin-top:10px">Condition<br><select id="fCond" data-track="srp|search-facets|dropdown|discovery|apply-filter"><option value="">Any</option><option value="new">New</option><option value="used">Used</option></select></label></aside>' +
+      '<section><h2 style="margin-top:0">142 results for "' + esc(kw) + '"</h2>' + cards + '</section></div>';
+    document.getElementById('fCond').value = qs.get('condition') || '';
+    Array.prototype.forEach.call(app.querySelectorAll('.card'), function (c) { c.onclick = function () { go('/listing/' + c.getAttribute('data-id')); }; });
+    function refilter() {
+      var p = new URLSearchParams(); p.set('keyword', kw);
+      if (document.getElementById('fPrice').checked) p.set('price', '0-30000');
+      var c = document.getElementById('fCond').value; if (c) p.set('condition', c);
+      go('/search?' + p.toString());
+    }
+    document.getElementById('fPrice').onchange = refilter;
+    document.getElementById('fCond').onchange = refilter;
+  }
+
+  if (page === 'detail') {
+    var l = window.__pwListing;
+    var others = Object.keys(L).filter(function (k) { return k !== l.adid; });
+    var sim = others.map(function (k) {
+      var o = L[k];
+      return '<div class="similar-card"><b>' + esc(o.title) + '</b><div class="muted">' + esc(o.dealerName) + '</div><div style="display:flex;gap:8px;margin-top:8px">' + phoneButton({ value: V.phoneSimilar, mini: true }) + '<a data-go="' + k + '" data-track="Detail-Similar Listings-View">View</a></div><div class="muted mini-phone" style="display:none;margin-top:6px">' + esc(o.phone) + '</div></div>';
+    }).join('');
+    app.innerHTML = '<p><a id="bk" data-track="vdp|breadcrumbs|link|navigation|back-to-results">&larr; Back to results</a></p><div class="grid" style="grid-template-columns:1fr 320px">' +
+      '<section class="panel listing-main"><h1>' + esc(l.title) + '</h1><div class="price">' + (l.priceText ? esc(l.priceText) : 'Call for price') + '</div>' +
+      '<dl class="specs"><dt>Type</dt><dd>' + esc(l.type) + '</dd><dt>Make</dt><dd>' + esc(l.displayMake) + '</dd><dt>Condition</dt><dd>' + esc(l.condition) + '</dd><dt>Dealer</dt><dd>' + esc(l.dealerName) + '</dd></dl>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">' + phoneButton({ value: V.phoneMain }) + '<button class="btn secondary" data-track="Detail-Link-Save this Listing">Save</button><button class="btn secondary" data-track="Detail-Link-Send to Friend">Share</button></div></section>' +
+      '<aside class="panel"><b>Email the dealer</b><form id="lead" novalidate><label for="ln">Name</label><input id="ln"><label for="le">Email</label><input id="le" type="email"><label for="lm">Message</label><textarea id="lm" rows="3">Is this still available?</textarea>' +
+      '<button class="btn" style="margin-top:10px;width:100%" data-track="pdp|lead-form|button|send-email">Send</button><div class="lead-state-box" id="leadBox"></div></form></aside></div>' +
+      '<h3>Similar listings</h3><div class="similar">' + sim + '</div>';
+    document.getElementById('bk').onclick = function () { go('/search?keyword=trailer'); };
+    var main = app.querySelector('.listing-main button');
+    main.onclick = function () { main.querySelector('.lbl').textContent = l.phone; };
+    Array.prototype.forEach.call(app.querySelectorAll('.similar-card'), function (card) {
+      card.querySelector('button').onclick = function () { card.querySelector('.mini-phone').style.display = 'block'; };
+      card.querySelector('[data-go]').onclick = function () { go('/listing/' + card.querySelector('[data-go]').getAttribute('data-go')); };
+    });
+    var leadCount = 0;
+    document.getElementById('lead').onsubmit = function (e) {
+      e.preventDefault();
+      var email = document.getElementById('le').value.trim();
+      var box = document.getElementById('leadBox');
+      /* simulate a short server round-trip, then render the result message */
+      box.innerHTML = '';
+      setTimeout(function () {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { box.innerHTML = V.leadMessage(false); }
+        else { leadCount += 1; box.innerHTML = V.leadMessage(true, 'LD-' + (90416 + leadCount)); }
+      }, 400);
+    };
+  }
+
+  document.getElementById('navHome').onclick = function () { go('/'); };
+  document.getElementById('signIn').onclick = function () { this.textContent = 'Log in (demo only)'; };
+
+  /* Harness: brief drawer, GTM ID input, Fullstory log panel */
+  var drawer = document.getElementById('drawer');
+  document.getElementById('briefBtn').onclick = function () { drawer.classList.add('open'); };
+  document.getElementById('briefClose').onclick = function () { drawer.classList.remove('open'); };
+  document.getElementById('gtmInput').value = window.__gtmId || '';
+  if (window.__gtmId) document.getElementById('gtmStatus').textContent = 'GTM: ' + window.__gtmId;
+  document.getElementById('gtmLoad').onclick = function () {
+    var v = document.getElementById('gtmInput').value.trim();
+    if (!/^GTM-[A-Z0-9]+$/i.test(v)) { document.getElementById('gtmStatus').textContent = 'GTM: ID should look like GTM-XXXXXXX'; return; }
+    location.href = BASE + '/?gtm=' + encodeURIComponent(v.toUpperCase());
+  };
+  var body = document.getElementById('logBody');
+  function addEntry(e) {
+    var empty = document.getElementById('logEmpty'); if (empty) empty.remove();
+    var d = document.createElement('div'); d.className = 'e ' + e.level;
+    d.innerHTML = '<span class="n">#' + e.n + ' ' + e.time + ' ' + esc(e.path) + '</span>\n<b>' + esc(e.method) + '</b> ' + esc(JSON.stringify(e.args)) + (e.note ? '\n<span class="note">' + esc(e.note) + '</span>' : '');
+    body.insertBefore(d, document.getElementById('copyArea'));
+    body.scrollTop = body.scrollHeight;
+  }
+  window.__fsSim.log.forEach(addEntry);
+  window.__fsSim.onRecord(addEntry);
+  document.getElementById('logClear').onclick = function () { window.__fsSim.clear(); Array.prototype.forEach.call(body.querySelectorAll('.e'), function (n) { n.remove(); }); };
+  document.getElementById('logToggle').onclick = function () { var c = body.classList.toggle('collapsed'); this.textContent = c ? 'Show' : 'Hide'; };
+  document.getElementById('logCopy').onclick = function () {
+    var text = JSON.stringify({ build: V.build, gtm: window.__gtmId, calls: window.__fsSim.log }, null, 2);
+    var ta = document.getElementById('copyArea');
+    function fallback() { ta.style.display = 'block'; ta.value = text; ta.select(); }
+    try { navigator.clipboard.writeText(text).then(function () { document.getElementById('logCopy').textContent = 'Copied'; }, fallback); } catch (e) { fallback(); }
+  };
+})();
+</script>
+</body>
+</html>
